@@ -15,9 +15,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+
+        // ユーザーの通知の許可を求める
+        let settings = UIUserNotificationSettings(forTypes: [UIUserNotificationType.Alert, UIUserNotificationType.Sound], categories: nil)
+        UIApplication.sharedApplication().registerUserNotificationSettings(settings)
+        
+        //　通知からの起動かどうかを確認する
+        if let notifcation = launchOptions? [UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
+            // 通知領域から削除する
+            application.cancelLocalNotification(notifcation)
+        }
+        
         return true
     }
+    
+    func application(application: UIApplication, didReceiveLocalNotification notifcation: UILocalNotification) {
+        
+        // アプリがフォアグランドにいる時に通知が届いた時
+        if application.applicationState == UIApplicationState.Active {
+            
+            //　アラートを表示する
+            let alertController = UIAlertController(title: "時間になりました", message: notifcation.alertBody, preferredStyle: .Alert)
+            let defautAction = UIAlertAction(title: "ok", style: UIAlertActionStyle.Default, handler: nil)
+            alertController.addAction(defautAction)
+            
+            window?.rootViewController!.presentViewController(alertController, animated: true, completion: nil)
+            
+        }else {
+            // バックグランドのいる時に通知が届いた時はログに出力するだけ
+            print("\(notifcation.alertBody)")
+        }
+        
+          //　通知両危機から削除する
+        application.cancelLocalNotification(notifcation)
+            
+    }
+
+
 
     func applicationWillResignActive(application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
